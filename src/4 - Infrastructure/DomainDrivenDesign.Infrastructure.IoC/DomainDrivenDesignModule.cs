@@ -18,13 +18,15 @@ public static class DomainDrivenDesignModule
     {
         // Repositories
         services.AddScoped<ISampleDataRepository, SampleDataRepository>();
+        services.AddScoped<ITwilioRepository, TwilioRepository>();
 
         // Services
         services.AddScoped<ISampleDataService, SampleDataService>();
+        services.AddScoped<IWhatsappService, WhatsappService>();
 
         // Mappers
         services.AddAutoMapper(typeof(SampleDataMapper));
-        
+
         // App Services (Commands in future)
         services.AddScoped<ISampleDataAppService, SampleDataAppService>();
     }
