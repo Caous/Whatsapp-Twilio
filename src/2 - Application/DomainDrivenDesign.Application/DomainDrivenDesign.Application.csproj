@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\4 - Infrastructure\DomainDrivenDesign.Infrastructure.Core\DomainDrivenDesign.Infrastructure.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mapper\" />
+  </ItemGroup>
+
 </Project>
