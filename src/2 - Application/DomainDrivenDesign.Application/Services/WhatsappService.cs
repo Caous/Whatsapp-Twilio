@@ -1,4 +1,5 @@
-﻿using DomainDrivenDesign.Application.Interfaces;
+﻿using DomainDrivenDesign.Application.Entities;
+using DomainDrivenDesign.Application.Interfaces;
 using DomainDrivenDesign.Domain.Entities;
 using DomainDrivenDesign.Domain.Interfaces.Repositories;
 
@@ -34,13 +35,29 @@ public class WhatsappService : IWhatsappService
         return 1;
     }
 
-    public async Task<List<IGrouping<string, Message>>> GetLastMessagens(Message? filter)
+    public async Task<ICollection<MessageDto>> GetLastMessagens(Message? filter)
     {
         var result = await _repositoryTwilio.GetMessages(filter);
 
         var resultGroup = result.Messages.GroupBy(x => x.ToUser).ToList();
 
-        return resultGroup;
+        List<MessageDto> resultFinally = new();
+
+        foreach (var item in resultGroup)
+        {
+            resultFinally.Add(new MessageDto()
+            {
+                CustomerName = item.First().ToUser,
+                DateMessage = item.First().DateCreate.Value,
+                Id = item.First().ConversationId,
+                PhoneNumber = item.Key,
+                ProtocolNumber = "XptoSp",
+                Service = "Suporte",
+                Status = "Encerrado"
+            });
+        }
+
+        return resultFinally;
 
     }
 
