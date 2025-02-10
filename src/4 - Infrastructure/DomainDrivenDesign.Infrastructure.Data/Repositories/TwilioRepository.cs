@@ -25,9 +25,8 @@ public class TwilioRepository : ITwilioRepository
 
     public async Task<BrokerLastMessagesResult> GetMessages(Message? filter)
     {
-        string? dataInicial = "";
-        string? dataFinal = "";
-
+        string? dataInicial = filter == null? "": filter.DateCreate.HasValue ? filter.DateCreate.Value.ToString() : "";
+        string? dataFinal = filter == null ? "" : filter.DateUpdated.HasValue ? filter.DateUpdated.Value.ToString() : "";
 
         TwilioClient.Init(_twilioOptions.Username, _twilioOptions.Password);
 
@@ -41,17 +40,22 @@ public class TwilioRepository : ITwilioRepository
     {
         DateTime dataInicial, dataFinal;
 
-        if (!DateTime.TryParseExact(dataInicialString, formato, CultureInfo.InvariantCulture, DateTimeStyles.None, out dataInicial))
+        if (string.IsNullOrEmpty(dataInicialString) && string.IsNullOrEmpty(dataFinalString))
         {
-            dataInicial = DateTime.Now.AddDays(-10);
+
+            if (!DateTime.TryParseExact(dataInicialString, formato, CultureInfo.InvariantCulture, DateTimeStyles.None, out dataInicial))
+            {
+                dataInicial = DateTime.Now.AddDays(-10);
+            }
+
+            if (!DateTime.TryParseExact(dataFinalString, formato, CultureInfo.InvariantCulture, DateTimeStyles.None, out dataFinal))
+            {
+                dataFinal = DateTime.Now.AddDays(1);
+            }
+            return (dataInicial, dataFinal);
         }
 
-        if (!DateTime.TryParseExact(dataFinalString, formato, CultureInfo.InvariantCulture, DateTimeStyles.None, out dataFinal))
-        {
-            dataFinal = DateTime.Now;
-        }
-
-        return (dataInicial, dataFinal);
+        return (Convert.ToDateTime(dataInicialString), Convert.ToDateTime(dataFinalString));
     }
 
     static BrokerLastMessagesResult ObterListaConvertidaMessage(ResourceSet<MessageResource> recordsTwilio, string twilioOptionsNumber)
@@ -79,7 +83,7 @@ public class TwilioRepository : ITwilioRepository
                     DateSend = record.DateSent,
                     DateCreate = record.DateCreated,
                     DateUpdated = record.DateUpdated,
-                    Text = record.Body,
+                    Text = record.Body
                 });
             }
         }
@@ -89,5 +93,21 @@ public class TwilioRepository : ITwilioRepository
         result.Messages.Reverse();
 
         return result;
+    }
+
+    public async Task<int?> CountNewCustomerMonth()
+    {
+        TwilioClient.Init(_twilioOptions.Username, _twilioOptions.Password);
+
+        DateTime dataInicial = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        DateTime dataFinal = dataInicial.AddMonths(1).AddDays(-1);
+
+        ResourceSet<MessageResource> recordsTwilio = await MessageResource.ReadAsync(dateSentAfter: dataInicial, dateSentBefore: dataFinal);
+
+        if (recordsTwilio == null)
+            return 0;
+
+        return recordsTwilio.Count();
+
     }
 }

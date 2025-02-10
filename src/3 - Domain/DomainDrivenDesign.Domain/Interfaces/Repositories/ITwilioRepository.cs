@@ -2,7 +2,7 @@
 
 namespace DomainDrivenDesign.Domain.Interfaces.Repositories;
 
-public  interface ITwilioRepository
+public interface ITwilioRepository
 {
     Task<BrokerLastMessagesResult> GetMessages(Message? filter);
 }
