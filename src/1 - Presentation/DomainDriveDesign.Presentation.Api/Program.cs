@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:2173", "https://front-traning-now.vercel.app");
+        policy.WithOrigins("http://localhost:5173", "https://front-traning-now.vercel.app");
         policy.AllowAnyHeader();
         policy.AllowAnyMethod();
     });
