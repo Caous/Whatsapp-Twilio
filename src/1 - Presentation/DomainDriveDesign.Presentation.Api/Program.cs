@@ -11,6 +11,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Register();
+
+#region Cors
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:2173", "https://front-traning-now.vercel.app");
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+    });
+});
+#endregion
+
 builder.Services.AddDbContext(builder.Configuration);
 
 var app = builder.Build();
@@ -27,5 +40,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors();
 
 app.Run();

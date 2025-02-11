@@ -21,7 +21,8 @@ public static class DomainDrivenDesignModule
         //services.AddAutoMapper(typeof(SampleDataMapper));
 
         // App Services (Commands in future)
-         }
+       
+    }
 
     public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
     {
