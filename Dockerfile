@@ -12,19 +12,22 @@ WORKDIR /src
 RUN apk add --no-cache icu-libs
 
 # Copia apenas os arquivos de projeto para otimizar o cache de build
-COPY Training_Now/Training_System/Training_System.csproj Training_System/
-COPY Training_Now/Domain/Training_Domain/Training_Domain.csproj Domain/Training_Domain/
-COPY Training_Now/Infrastructure/Training_Infrastructure/Training_Infrastructure.csproj Infrastructure/Training_Infrastructure/
+COPY ["src/1 - Presentation/DomainDriveDesign.Presentation.Api/DomainDrivenDesign.Presentation.Api.csproj", "Twilio/"]
+COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.IoC/DomainDrivenDesign.Infrastructure.IoC.csproj",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.IoC/"]
+COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Core/DomainDrivenDesign.Infrastructure.Core.csproj",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Core/"]
+COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Data/DomainDrivenDesign.Infrastructure.Data.csproj",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Data/"]
+COPY ["src/2 - Application/DomainDrivenDesign.Application/DomainDrivenDesign.Application.csproj",  "/2 - Application/DomainDrivenDesign.Application/"]
+COPY ["src/3 - Domain/DomainDrivenDesign.Domain/DomainDrivenDesign.Domain.csproj",  "/3 - Domain/DomainDrivenDesign.Domain/"]
 
 # Restaura as dependências
-RUN dotnet restore Training_System/Training_System.csproj
+RUN dotnet restore Twilio/DomainDrivenDesign.Presentation.Api.csproj
 
 # Copia o restante do código-fonte
-COPY Training_Now/ .
+COPY src/ .
 
 # Compila o projeto e publica os binários
-WORKDIR /src/Training_System
-RUN dotnet publish -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR /src/Twilio
+RUN dotnet publish "DomainDrivenDesign.Presentation.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 
 # Imagem final minimalista
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
@@ -38,4 +41,4 @@ RUN apk add --no-cache icu-libs
 # Limpeza de cache do Alpine para reduzir ainda mais o tamanho
 RUN rm -rf /var/cache/apk/*
 
-ENTRYPOINT ["dotnet", "Training_System.dll", "--urls", "http://0.0.0.0:80"]
+ENTRYPOINT ["dotnet", "DomainDrivenDesign.Presentation.Api.dll", "--urls", "http://0.0.0.0:80"]
