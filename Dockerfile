@@ -12,22 +12,23 @@ WORKDIR /src
 RUN apk add --no-cache icu-libs
 
 # Copia apenas os arquivos de projeto para otimizar o cache de build
-COPY ["src/1 - Presentation/DomainDriveDesign.Presentation.Api/DomainDrivenDesign.Presentation.Api.csproj", "Twilio/"]
-COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.IoC/DomainDrivenDesign.Infrastructure.IoC.csproj",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.IoC/"]
-COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Core/DomainDrivenDesign.Infrastructure.Core.csproj",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Core/"]
-COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Data/DomainDrivenDesign.Infrastructure.Data.csproj",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Data/"]
-COPY ["src/2 - Application/DomainDrivenDesign.Application/DomainDrivenDesign.Application.csproj",  "/2 - Application/DomainDrivenDesign.Application/"]
-COPY ["src/3 - Domain/DomainDrivenDesign.Domain/DomainDrivenDesign.Domain.csproj",  "/3 - Domain/DomainDrivenDesign.Domain/"]
+COPY ["src/1 - Presentation/DomainDriveDesign.Presentation.Api/", "Api/"]
+COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.IoC/",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.IoC/"]
+COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Core/",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Core/"]
+COPY ["src/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Data/",  "/4 - Infrastructure/DomainDrivenDesign.Infrastructure.Data/"]
+COPY ["src/2 - Application/DomainDrivenDesign.Application/",  "/2 - Application/DomainDrivenDesign.Application/"]
+COPY ["src/3 - Domain/DomainDrivenDesign.Domain/",  "/3 - Domain/DomainDrivenDesign.Domain/"]
 
 # Restaura as dependências
-RUN dotnet restore Twilio/DomainDrivenDesign.Presentation.Api.csproj
+RUN dotnet restore Api/DomainDrivenDesign.Presentation.Api.csproj
 
 # Copia o restante do código-fonte
-COPY src/ .
+COPY /src/ .
 
 # Compila o projeto e publica os binários
-WORKDIR /src/Twilio
-RUN dotnet publish "DomainDrivenDesign.Presentation.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish
+WORKDIR /src/Api
+
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app/publish 
 
 # Imagem final minimalista
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
