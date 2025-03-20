@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Mapper\" />
+    <Folder Include="Entities\Request\" />
   </ItemGroup>
 
 </Project>

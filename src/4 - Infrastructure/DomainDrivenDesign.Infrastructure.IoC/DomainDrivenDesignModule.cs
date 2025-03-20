@@ -20,7 +20,9 @@ public static class DomainDrivenDesignModule
         services.AddScoped<IWhatsappService, WhatsappService>();
 
         // Mappers
-        //services.AddAutoMapper(typeof(SampleDataMapper));
+
+        // Mappers
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         // App Services (Commands in future)
 

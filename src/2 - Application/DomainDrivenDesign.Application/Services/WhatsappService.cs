@@ -1,4 +1,7 @@
-﻿using DomainDrivenDesign.Application.Entities;
+﻿using System.Text.RegularExpressions;
+using AutoMapper;
+using DomainDrivenDesign.Application.Entities;
+using DomainDrivenDesign.Application.Entities.Response;
 using DomainDrivenDesign.Application.Interfaces;
 using DomainDrivenDesign.Domain.Entities;
 using DomainDrivenDesign.Domain.Interfaces.Repositories;
@@ -10,11 +13,13 @@ public class WhatsappService : IWhatsappService
 {
     private readonly ITwilioRepository _repositoryTwilio;
     private readonly IMongoRepository _mongoRepository;
+    private readonly IMapper _mapper;
 
-    public WhatsappService(ITwilioRepository repositoryTwilio, IMongoRepository mongoRepository)
+    public WhatsappService(ITwilioRepository repositoryTwilio, IMongoRepository mongoRepository, IMapper mapper)
     {
         _repositoryTwilio = repositoryTwilio;
         _mongoRepository = mongoRepository;
+        _mapper = mapper;
     }
 
     public async Task<int?> CountMessagesPending(Message? filter)
@@ -38,9 +43,27 @@ public class WhatsappService : IWhatsappService
         return 1;
     }
 
-    public async Task<ICollection<GroupMongo>> GetAllAsync()
+    public async Task<ICollection<MessagesResponseDto>> GetAllAsync()
     {
-        return await _mongoRepository.GetAllAsync();
+        var resultMongo = await _mongoRepository.GetAllAsync();
+        var result = _mapper.Map<ICollection<MessagesResponseDto>>(resultMongo);
+        foreach (var item in result)
+        {
+            string pattern = @"whatsapp:\+55(\d{2})(\d{5})(\d{4})";
+
+            var match = Regex.Match(item.ConversationId, pattern);
+            if (match.Success)
+            {
+                string ddd = match.Groups[1].Value;
+                string part1 = match.Groups[2].Value;
+                string part2 = match.Groups[3].Value;
+
+                string formattedNumber = $"+55 ({ddd}) {part1}-{part2}";
+                item.PhoneNumber = formattedNumber;
+            }
+            item.DateConversation = item.Messages.FirstOrDefault().Date.ToString("dd/MM/yyyy");
+        }
+        return result;
     }
 
     public async Task<ICollection<MessageDto>> GetLastMessagens(Message? filter)
