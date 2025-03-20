@@ -11,4 +11,7 @@ public interface IWhatsappService
     Task<int?> RecurrenceCustomer(Message? filter);
     Task<int?> CountNewTicketsSupport(Message? filter);
     Task<int?> CountMessagesPending(Message? filter);
+    Task<ICollection<Message>> ValitadorMessageAsync(string request);
+    Task RegisterMessages(ICollection<Message> messages);
+    Task<ICollection<GroupMongo>> GetAllAsync();
 }

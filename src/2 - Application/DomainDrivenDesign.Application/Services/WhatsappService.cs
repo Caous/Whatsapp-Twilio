@@ -2,16 +2,19 @@
 using DomainDrivenDesign.Application.Interfaces;
 using DomainDrivenDesign.Domain.Entities;
 using DomainDrivenDesign.Domain.Interfaces.Repositories;
+using Newtonsoft.Json;
 
 namespace DomainDrivenDesign.Application.Services;
 
 public class WhatsappService : IWhatsappService
 {
     private readonly ITwilioRepository _repositoryTwilio;
+    private readonly IMongoRepository _mongoRepository;
 
-    public WhatsappService(ITwilioRepository repositoryTwilio)
+    public WhatsappService(ITwilioRepository repositoryTwilio, IMongoRepository mongoRepository)
     {
         _repositoryTwilio = repositoryTwilio;
+        _mongoRepository = mongoRepository;
     }
 
     public async Task<int?> CountMessagesPending(Message? filter)
@@ -33,6 +36,11 @@ public class WhatsappService : IWhatsappService
     {
         //ToDo: Implementar posteriormente
         return 1;
+    }
+
+    public async Task<ICollection<GroupMongo>> GetAllAsync()
+    {
+        return await _mongoRepository.GetAllAsync();
     }
 
     public async Task<ICollection<MessageDto>> GetLastMessagens(Message? filter)
@@ -76,5 +84,21 @@ public class WhatsappService : IWhatsappService
         var result = await _repositoryTwilio.GetMessages(filter);
         var count = result.Messages.Select(x => recurrenceCustomer.Contains(x.ToUser)).Distinct().Count();
         return count;
+    }
+
+    public Task RegisterMessages(ICollection<Message> messages)
+    {
+        //ToDo: Criar um repositorio Mongo ou SqlServer
+        throw new NotImplementedException();
+    }
+
+    public async Task<ICollection<Message>> ValitadorMessageAsync(string request)
+    {
+        if (!string.IsNullOrEmpty(request))
+        {
+            ICollection<Message> messages = JsonConvert.DeserializeObject<ICollection<Message>>(request);
+            return messages;
+        }
+        return null;
     }
 }

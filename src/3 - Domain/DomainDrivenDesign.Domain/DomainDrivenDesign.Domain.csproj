@@ -15,4 +15,8 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="3.2.1" />
+  </ItemGroup>
+
 </Project>

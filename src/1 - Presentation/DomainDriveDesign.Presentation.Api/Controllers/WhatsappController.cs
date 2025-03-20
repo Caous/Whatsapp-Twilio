@@ -1,6 +1,8 @@
 ﻿using DomainDrivenDesign.Application.Interfaces;
 using DomainDrivenDesign.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace DomainDrivenDesign.Presentation.Api.Controllers;
 
@@ -18,6 +20,19 @@ public class WhatsappController : ControllerBase
     public WhatsappController(IWhatsappService serviceWhatsapp)
     {
         _serviceWhatsapp = serviceWhatsapp;
+    }
+
+    [HttpPost("AddMessagens")]
+    public async Task<IActionResult> AddMessages(string request)
+    {
+        ICollection<Message> messages = await _serviceWhatsapp.ValitadorMessageAsync(request);
+
+        if (messages != null && messages.Any())
+        {
+            await _serviceWhatsapp.RegisterMessages(messages);
+        }
+
+        return Ok("Register Sucess");
     }
 
     [HttpGet("CountMessagesPending")]
@@ -90,6 +105,18 @@ public class WhatsappController : ControllerBase
     {
 
         BrokerLastMessagesResult result = await _serviceWhatsapp.GetMessages(null);
+
+        if (result == null)
+            return NoContent();
+
+        return Ok(result);
+
+    }
+
+    [HttpGet("GetAllMessagensMongo")]
+    public async Task<IActionResult> GetAllMessageMongo() {
+
+        var result = await _serviceWhatsapp.GetAllAsync();
 
         if (result == null)
             return NoContent();
